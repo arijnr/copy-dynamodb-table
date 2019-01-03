@@ -201,7 +201,7 @@ function getItems(options, fn) {
     if (err) {
       return fn(err,data)
     }
-    fn(err, mapItems(data, options.mapper))
+    fn(err, mapItems(data, options.mapper, options.filter))
   })
 }
 
@@ -214,7 +214,8 @@ function scan(options, fn) {
   }, fn)
 }
 
-function mapItems(data, mapper) {
+function mapItems(data, mapper, filter) {
+  if (filter) data.Items = data.Items.filter(filter);
   var mapItem = mapper;
   if (!mapItem) mapItem = function (item) { return item };
   data.Items = data.Items.map(function (item) {
