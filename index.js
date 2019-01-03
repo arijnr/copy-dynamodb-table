@@ -37,7 +37,8 @@ function copy(values, fn) {
     data: {},
     log: values.log,
     create: values.create,
-    mapper: values.mapper || undefined
+    mapper: values.mapper || undefined,
+    filter: values.filter || undefined
   }
 
   if(options.source.active && options.destination.active){ // both tables are active
