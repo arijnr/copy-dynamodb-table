@@ -36,7 +36,8 @@ function copy(values, fn) {
     retries: 0,
     data: {},
     log: values.log,
-    create : values.create
+    create: values.create,
+    mapper: values.mapper || undefined
   }
 
   if(options.source.active && options.destination.active){ // both tables are active
@@ -200,7 +201,7 @@ function getItems(options, fn) {
     if (err) {
       return fn(err,data)
     }
-    fn(err, mapItems(data))
+    fn(err, mapItems(data, options.mapper))
   })
 }
 
@@ -213,11 +214,13 @@ function scan(options, fn) {
   }, fn)
 }
 
-function mapItems(data) {
+function mapItems(data, mapper) {
+  var mapItem = mapper;
+  if (!mapItem) mapItem = function (item) { return item };
   data.Items = data.Items.map(function (item) {
     return {
       PutRequest: {
-        Item: item
+        Item: mapItem(item)
       }
     }
   })
