@@ -38,7 +38,8 @@ function copy(values, fn) {
     log: values.log,
     create: values.create,
     mapper: values.mapper || undefined,
-    filter: values.filter || undefined
+    filter: values.filter || undefined,
+    slowFilter: values.slowFilter || undefined
   }
 
   if(options.source.active && options.destination.active){ // both tables are active
@@ -202,10 +203,9 @@ function getItems(options, fn) {
     if (err) {
       return fn(err,data)
     }
-    fn(err, mapItems(data, options.mapper, options.filter))
+    return filterItems(options, data, fn)
   })
 }
-
 
 function scan(options, fn) {
   options.source.dynamoClient.scan({
@@ -215,8 +215,19 @@ function scan(options, fn) {
   }, fn)
 }
 
-function mapItems(data, mapper, filter) {
-  if (filter) data.Items = data.Items.filter(filter);
+function filterItems(options, data, fn){
+  if (options.filter) data.Items = data.Items.filter(options.filter);
+
+  if (options.slowFilter) {
+    return options.slowFilter(options, data, data.Items.length - 1, function (err, data) {
+      return fn(err, mapItems(data, options.mapper))
+    });
+  }
+
+  return fn(null, mapItems(data, options.mapper))
+}
+
+function mapItems(data, mapper) {
   var mapItem = mapper;
   if (!mapItem) mapItem = function (item) { return item };
   data.Items = data.Items.map(function (item) {
