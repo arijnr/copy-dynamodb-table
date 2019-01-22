@@ -185,6 +185,7 @@ function startCopying(options,fn){
         readline.clearLine(process.stdout)
         readline.cursorTo(process.stdout, 0)
         process.stdout.write('Copied ' + options.counter + ' items')
+        console.log('Copied ' + options.counter + ' items')
       }
 
       if (options.key === undefined) {
